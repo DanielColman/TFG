@@ -28,6 +28,7 @@ for row2 in results:
 
             #Almacenamos en una Matriz, donde cada fila corresponde a (PacienteX,PacienteY,Distancia)
             resultDist.append(dist)
+            resultDist.sort(key=itemgetter(2))
 
 
 #Persistimos los resultados en un archivo .CSV (dataDistance)
@@ -38,20 +39,21 @@ with open('dataDistance.csv', 'w') as csvfile2:
     for row in resultDist:
         writer.writerow( { 'Paciente1': row[0], 'Paciente2': row[1], 'Distancia': row[2] } )
 
-#Poner Condicion para evitar centro consigo mismo
+#Poner Condicion para evitar centro consigo mismo (Exito)
 #Obtener distancias de Centros de Gravedad
 for row2 in results:
     for row3 in results:
-        centroGravedad = []
-        xPeso = (int(row2['Peso'])+int(row3['Peso'])) / 2
-        yEdad = (int(row2['Edad'])+int(row3['Edad'])) / 2 
-        centroGravedad.append(row2['id'])
-        centroGravedad.append(row3['id'])
-        centroGravedad.append(xPeso)
-        centroGravedad.append(yEdad)
+        if (row2['id'] != row3['id']):
+            centroGravedad = []
+            xPeso = (int(row2['Peso'])+int(row3['Peso'])) / 2
+            yEdad = (int(row2['Edad'])+int(row3['Edad'])) / 2 
+            centroGravedad.append(row2['id'])
+            centroGravedad.append(row3['id'])
+            centroGravedad.append(xPeso)
+            centroGravedad.append(yEdad)
 
-        #Almacenamos en una Matriz, donde cada fila corresponde a (PacienteX, PacienteY, xPeso, yEdad)
-        resultCentroGravedad.append(centroGravedad)
+            #Almacenamos en una Matriz, donde cada fila corresponde a (PacienteX, PacienteY, xPeso, yEdad)
+            resultCentroGravedad.append(centroGravedad)
 
 
 #Persistimos los resultados en un archivo .CSV (dataCentroGravedad)
@@ -74,7 +76,7 @@ for row1 in results:                        #t1
                 combinatorias = []
                 if  (row1['id'] != row2['id'] and row1['id'] != row3['id'] and row1['id'] != row4['id'] and row2['id'] != row3['id'] and row2['id'] != row4['id'] and row3['id'] != row4['id']):
                         
-                    #Recuperamos del dataDistance.csv, la distancia uclidiana previamente calculada
+                    #Recuperamos del dataDistance.csv, la distancia Euclidiana previamente calculada
                     for element in resultDist:
                         if element[0] == row1['id'] and element[1] == row3['id']:
                             D1 = float(element[2])    #D(c1,t1)
