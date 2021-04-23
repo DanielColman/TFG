@@ -51,10 +51,30 @@ def fitness(conjunto):
 
     return fitsPadres
 
+def cruzar(padres):
+    c=0
+    hijos=[]
+    cant=len(padres[0][0])-1
+    cross=random.randint(0,cant-1)
 
+    while c<=cross:
+        a=padres[0][0][c]
+        b=padres[1][0][c]
+        
+        padres[0][0][c] = b
+        padres[1][0][c] = a
 
+        c+=1
 
+    for row in padres:
+        hijos.append(row[0])
+    
+    #print(hijos)
+    return(hijos)
+    #return (padres[random.randint(0,1)])
 
+        
+ 
 results = []
 resultDist = []
 resultCentroGravedad = []
@@ -62,22 +82,25 @@ resultCombinatoria = []
 familia = []
 solucion = []
 individuo=[]
+descendencia=[]
+aux=[]
+
 
 
 
 #Abrir csv y volcar contenido a una lista (Formato Json)
-with open('data.csv') as csvfile:
+with open('codigos/data.csv') as csvfile:
     reader = csv.DictReader(csvfile, delimiter=';')
     for row in reader:
         results.append(row)
 
 
 
-#PASO 1 (Generar aleatoriamente el primer conjunto de soluciones factible)
+#PASO 1 (Generar aleatoriamente el primer conjunto de soluciones factibles)
 
 #Crear la familia de soluciones factibles
 cardinalidad = 0
-while cardinalidad <= 4:  #Defino en 20 la cardinalidad del conjunto de soluciones
+while cardinalidad <= 4:  #Defino en 4 la cardinalidad del Población
     cardinalidad+=1
     
     familia.append((random.sample(range(5), 4)))
@@ -85,7 +108,29 @@ while cardinalidad <= 4:  #Defino en 20 la cardinalidad del conjunto de solucion
 print(familia)
 
 #PASO 2 (Seleccionar por Fitness las 2 Mejores Soluciones - "Soluciones Padres")
-fit = fitness(familia)
+padresFit = fitness(familia)
+print(padresFit)
 
-print(fit)
+
+#PASO 3 (Cruzo los padres para generar una nueva Población hijo)
+hijos=0
+
+print("-----------")
+while hijos <= 1:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
+    hijos+=1
+    #Agrego los hijos a la nueva poblacion
+    aux = cruzar(padresFit)
+    print(aux) 
+
+    for row in aux:
+        print(row)
+        descendencia.insert(len(descendencia+1),row)
+        #descendencia.append(row)
+    
+    
+    #print(padresFit)
+
+print (descendencia)
+
+
 
