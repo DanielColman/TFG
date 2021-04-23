@@ -117,6 +117,7 @@ for row1 in results:                        #t1
 #Ordenamos la metricas en funcion a la Calidad de Menor a Mayor
 resultCombinatoria.sort(key=itemgetter(4))
 
+
 #Persistimos los resultados en un archivo .CSV (dataCentroGravedad)
 with open('metricasCalidad.csv', 'w') as csvfile4:
     fieldnames = ['PacienteTest1', 'PacienteTest2', 'PacienteControl1', 'PacienteControl2', 'Q (Calidad)']
