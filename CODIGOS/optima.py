@@ -1,3 +1,5 @@
+import time
+inicio = time.time()
 
 #Importaremos los DATOS desde data.csv
 import csv, math
@@ -9,8 +11,8 @@ resultCombinatoria = []
 
 
 #Abrir csv y volcar contenido a una lista (Formato Json)
-with open('data.csv') as csvfile:
-    reader = csv.DictReader(csvfile, delimiter=';')
+with open('data100.csv') as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=',')
     for row in reader:
         results.append(row)
 
@@ -127,5 +129,6 @@ with open('metricasCalidad.csv', 'w') as csvfile4:
         writer.writerow( { 'PacienteTest1': row[0], 'PacienteTest2': row[1], 'PacienteControl1': row[2], 'PacienteControl2': row[3], 'Q (Calidad)':row[4] } )
 
 
-
+fin = time.time()
+print(fin-inicio)
                             

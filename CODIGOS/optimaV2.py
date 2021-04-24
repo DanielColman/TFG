@@ -1,10 +1,13 @@
 #Importaremos los DATOS desde data.csv
+import time
+inicio = time.time()
+
 import csv, math, random
 from operator import itemgetter
 
 def replaceRepetido(solucion,espacio):
-    c=0
     for i in range(1, len(solucion)):
+        c=0
         if solucion[i] in solucion[:i]:
             while c!=-1:
                 valorReemplazo =random.randint(0,espacio)
@@ -16,7 +19,6 @@ def replaceRepetido(solucion,espacio):
 def fitness(conjunto): 
 
     fit=[]
-    #fit={"solution":[],"fitness":[]}
     fits=[]
     fitsPadres=[]
    
@@ -60,9 +62,12 @@ def fitness(conjunto):
     fitsPadres.append(fits[0])
     fitsPadres.append(fits[1])
 
+    #Para no seleccionar padres GEMELOS
+    
+
     return fitsPadres
 
-def cruzar(padres):
+def cruzar(padres, espacio):
 
     c=0
     hijos=[]
@@ -93,14 +98,14 @@ def cruzar(padres):
         c+=1
 
     for row in hijos:
-        replaceRepetido(row,4) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE VARIABLES
+        replaceRepetido(row,espacio) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA DE INDIVIDUOS
 
-
+    #print(hijos[0][:],hijos[1][:])
     return(hijos[0][:],hijos[1][:])
 
 def mutar(hijos, espacio):
-    c=0
     for row in hijos:
+        c=0
         cant=len(row)-1
         while c!=-1:
             genMutado=random.randint(0,cant)
@@ -125,52 +130,58 @@ descendencia=[]
 
 
 #Abrir csv y volcar contenido a una lista (Formato Json)
-with open('data.csv') as csvfile:
-    reader = csv.DictReader(csvfile, delimiter=';')
+with open('data1000.csv') as csvfile:
+    reader = csv.DictReader(csvfile, delimiter=',')
     for row in reader:
         results.append(row)
 
 
-
 #PASO 1 (Generar aleatoriamente el primer conjunto de soluciones factibles)
 #Crear la familia de soluciones factibles
+
+##################################
+SolFactibles = 6 #NUMERO PAR
+##################################
+
 cardinalidad = 0
-while cardinalidad <= 5:  #Defino en 4 la cardinalidad del Población
+while cardinalidad <= SolFactibles-1:  #Defino en 4 la cardinalidad del Población
     cardinalidad+=1
-    
-    familia.append((random.sample(range(5), 4)))
-#print(familia)
+    familia.append((random.sample(range(len(results)), 4)))
+print(familia)
 
 generacion=0
 hijosMutados=[]
-while (generacion<=20):
+while (generacion<=1000):
     #PASO 2 (Seleccionar por Fitness las 2 Mejores Soluciones - "Soluciones Padres")
     if generacion==0:
         padresFit = fitness(familia)
     else:
         padresFit=fitness(hijosMutados)
     print(padresFit)
+    #print(padresFit[0])
    
     #PASO 3 (Cruzo los padres para generar una nueva Población Hija)
-    hijo=0
-    while hijo <= 2:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
+    hijo=1
+    while hijo <= SolFactibles/2:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
         hijo+=1
-        descendencia.extend(cruzar(padresFit))
+        descendencia.extend(cruzar(padresFit,len(results)-1))
     print (descendencia)
 
     #Aplicar Mutacion la nueva la Generación
-    hijosMutados=mutar(descendencia,4) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE VARIABLES
+    hijosMutados=mutar(descendencia,len(results)-1) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE INDIVIDUOS
     descendencia.clear()
     
-    #print(hijosMutados)
+    print(hijosMutados)
 
     #Usar Etilismo y agregar el mejor padre a la probacion hija
-    #hijosMutados.append(padresFit[0][0])
+    hijosMutados.append(padresFit[0][0])
     #print(hijosMutados)
   
+    print("--------------------------")
     generacion+=1
 
-
+fin = time.time()
+print(fin-inicio)
 
 
 
