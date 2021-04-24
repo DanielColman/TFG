@@ -2,6 +2,17 @@
 import csv, math, random
 from operator import itemgetter
 
+def replaceRepetido(solucion,espacio):
+    c=0
+    for i in range(1, len(solucion)):
+        if solucion[i] in solucion[:i]:
+            while c!=-1:
+                valorReemplazo =random.randint(0,espacio)
+                if not (valorReemplazo in solucion):
+                    solucion[i]=valorReemplazo
+                    c=-1
+
+
 def fitness(conjunto): 
 
     fit=[]
@@ -52,12 +63,13 @@ def fitness(conjunto):
     return fitsPadres
 
 def cruzar(padres):
+
     c=0
     hijos=[]
     cant=len(padres[0][0])-1
-    cross=random.randint(0,cant-1)
-
+    cross=random.randint(0,cant)
     while c<=cross:
+
         a=padres[0][0][c]
         b=padres[1][0][c]
         
@@ -67,12 +79,39 @@ def cruzar(padres):
         c+=1
 
     for row in padres:
-        hijos.append(row[0])
+        hijos.append(row[0][:])
+    
+    c=0
+    while c<=cross:
+
+        a=padres[0][0][c]
+        b=padres[1][0][c]
+        
+        padres[0][0][c] = b
+        padres[1][0][c] = a
+
+        c+=1
+
+    for row in hijos:
+        replaceRepetido(row,4) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE VARIABLES
+
+
+    return(hijos[0][:],hijos[1][:])
+
+def mutar(hijos, espacio):
+    c=0
+    for row in hijos:
+        cant=len(row)-1
+        while c!=-1:
+            genMutado=random.randint(0,cant)
+            valorMutado =random.randint(0,espacio)
+            if not (valorMutado in row):
+                row[genMutado]=valorMutado
+                c=-1
+
     
     #print(hijos)
-    return(hijos)
-    #return (padres[random.randint(0,1)])
-
+    return hijos[:][:]
         
  
 results = []
@@ -83,13 +122,10 @@ familia = []
 solucion = []
 individuo=[]
 descendencia=[]
-aux=[]
-
-
 
 
 #Abrir csv y volcar contenido a una lista (Formato Json)
-with open('codigos/data.csv') as csvfile:
+with open('data.csv') as csvfile:
     reader = csv.DictReader(csvfile, delimiter=';')
     for row in reader:
         results.append(row)
@@ -97,40 +133,45 @@ with open('codigos/data.csv') as csvfile:
 
 
 #PASO 1 (Generar aleatoriamente el primer conjunto de soluciones factibles)
-
 #Crear la familia de soluciones factibles
 cardinalidad = 0
-while cardinalidad <= 4:  #Defino en 4 la cardinalidad del Población
+while cardinalidad <= 5:  #Defino en 4 la cardinalidad del Población
     cardinalidad+=1
     
     familia.append((random.sample(range(5), 4)))
+#print(familia)
+
+generacion=0
+hijosMutados=[]
+while (generacion<=20):
+    #PASO 2 (Seleccionar por Fitness las 2 Mejores Soluciones - "Soluciones Padres")
+    if generacion==0:
+        padresFit = fitness(familia)
+    else:
+        padresFit=fitness(hijosMutados)
+    print(padresFit)
+   
+    #PASO 3 (Cruzo los padres para generar una nueva Población Hija)
+    hijo=0
+    while hijo <= 2:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
+        hijo+=1
+        descendencia.extend(cruzar(padresFit))
+    print (descendencia)
+
+    #Aplicar Mutacion la nueva la Generación
+    hijosMutados=mutar(descendencia,4) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE VARIABLES
+    descendencia.clear()
     
-print(familia)
+    #print(hijosMutados)
 
-#PASO 2 (Seleccionar por Fitness las 2 Mejores Soluciones - "Soluciones Padres")
-padresFit = fitness(familia)
-print(padresFit)
+    #Usar Etilismo y agregar el mejor padre a la probacion hija
+    #hijosMutados.append(padresFit[0][0])
+    #print(hijosMutados)
+  
+    generacion+=1
 
 
-#PASO 3 (Cruzo los padres para generar una nueva Población hijo)
-hijos=0
 
-print("-----------")
-while hijos <= 1:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
-    hijos+=1
-    #Agrego los hijos a la nueva poblacion
-    aux = cruzar(padresFit)
-    print(aux) 
-
-    for row in aux:
-        print(row)
-        descendencia.insert(len(descendencia+1),row)
-        #descendencia.append(row)
-    
-    
-    #print(padresFit)
-
-print (descendencia)
 
 
 
