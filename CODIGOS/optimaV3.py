@@ -27,27 +27,40 @@ def fitness(conjunto):
         #row.sort()
         
         #Distancia Euclidiana
-        eTest1=int(results[row[0]]['Edad'])
-        eTest2=int(results[row[1]]['Edad'])
-        eControl1=int(results[row[2]]['Edad'])
-        eControl2=int(results[row[3]]['Edad']) 
 
-        pTest1=int(results[row[0]]['Peso'])
-        pTest2=int(results[row[1]]['Peso'])
-        pControl1=int(results[row[2]]['Peso'])
-        pControl2=int(results[row[3]]['Peso']) 
+        cantIndividuos =  len(row)
+        individuosPorGrupo = int(cantIndividuos / 2) 
+        
+        c=0
+        sumDistancias=0
+        xPesoT=0
+        xPesoC=0
+        yEdadT=0
+        yEdadC=0
+        while c<individuosPorGrupo:
+            eTest=int(results[row[c]]['Edad'])
+            eControl=int(results[row[individuosPorGrupo+c]]['Edad'])
+            pTest=int(results[row[c]]['Peso'])
+            pControl=int(results[row[individuosPorGrupo+c]]['Peso'])
 
-        distancia1 = math.sqrt((eTest1-eControl1)**2+(pTest1-pControl1)**2)
-        distancia2 = math.sqrt((eTest2-eControl2)**2+(pTest2-pControl2)**2)
+            distancia = math.sqrt((eTest-eControl)**2+(pTest-pControl)**2)
+            sumDistancias += distancia
+            #Centro de Gravedad
+            xPesoT += int(results[row[c]]['Peso'])
+            yEdadT += int(results[row[c]]['Edad'])
+            
+            xPesoC += int(results[row[individuosPorGrupo+c]]['Peso'])
+            yEdadC += int(results[row[individuosPorGrupo+c]]['Edad'])
+            
+            c+=1
 
-        #Distancia Centro de Gravedad
-        xPesoT = (int(results[row[0]]['Peso'])+int(results[row[1]]['Peso'])) / 2
-        yEdadT = (int(results[row[0]]['Edad'])+int(results[row[1]]['Edad'])) / 2
+        xPesoT = xPesoT/2
+        yEdadT = yEdadT/2
+        
+        xPesoC = xPesoC/2
+        yEdadC = yEdadC/2
 
-        xPesoC = (int(results[row[2]]['Peso'])+int(results[row[3]]['Peso'])) / 2
-        yEdadC = (int(results[row[2]]['Edad'])+int(results[row[3]]['Edad'])) / 2
-
-        Q1=(distancia1+distancia2)
+        Q1=sumDistancias
         Q2=math.sqrt((xPesoT-xPesoC)**2 + (yEdadT-yEdadC)**2)
 
         Q=500*Q1+Q2 
@@ -146,39 +159,40 @@ SolFactibles = 6 #NUMERO PAR
 cardinalidad = 0
 while cardinalidad <= SolFactibles-1:  #Defino en 4 la cardinalidad del Población
     cardinalidad+=1
-    familia.append((random.sample(range(len(results)), 4)))
-print(familia)
+    familia.append((random.sample(range(len(results)), 4))) #El valor numerico significa la cantidad de individuos seleccionados para tes y control
+#print(familia)
 
 generacion=0
 hijosMutados=[]
-while (generacion<=10):
+while (generacion<=100000):
     #PASO 2 (Seleccionar por Fitness las 2 Mejores Soluciones - "Soluciones Padres")
     if generacion==0:
         padresFit = fitness(familia)
     else:
         padresFit=fitness(hijosMutados)
-    print(padresFit)
-    #print(padresFit[0])
+    #print(padresFit)
+    print(padresFit[0][1])
    
     #PASO 3 (Cruzo los padres para generar una nueva Población Hija)
     hijo=1
     while hijo <= SolFactibles/2:  #Defino la cantidad de hijos generados, EL CRUZAMIENTO DEVUELVE 2 HIJOS
         hijo+=1
         descendencia.extend(cruzar(padresFit,len(results)-1))
-    print (descendencia)
+    #print (descendencia)
 
     #Aplicar Mutacion la nueva la Generación
     hijosMutados=mutar(descendencia,len(results)-1) #OJOOOOOOOOOOOOO EL VALOR CORRESPONDE A LA CANTIDAD DE INDIVIDUOS
     descendencia.clear()
     
-    print(hijosMutados)
+    #print(hijosMutados)
 
     #Usar Etilismo y agregar el mejor padre a la probacion hija
     hijosMutados.append(padresFit[0][0])
     #print(hijosMutados)
   
-    print("--------------------------")
+    #print("--------------------------")
     generacion+=1
+
 
 fin = time.time()
 print(fin-inicio)
